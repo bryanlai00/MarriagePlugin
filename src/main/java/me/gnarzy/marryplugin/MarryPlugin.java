@@ -9,6 +9,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+
 public final class MarryPlugin extends JavaPlugin implements Listener {
     public static MarryPlugin plugin;
     //Getting an instance of the MarryCommand.
@@ -42,6 +44,13 @@ public final class MarryPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
-
+        //Removing proposals if either player quits the server.
+        ArrayList<String[]> proposals = marryCommand.proposals;
+        for(int i = 0; i < proposals.size(); i++) {
+            String[] proposal = proposals.get(i);
+            if(proposal[0].equals(e.getPlayer().getName()) || proposal[1].equals(e.getPlayer().getName())) {
+                proposals.remove(i);
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 public class MarryCommand implements CommandExecutor {
-    ArrayList<String[]> proposals = new ArrayList<String[]>();
+    public ArrayList<String[]> proposals = new ArrayList<String[]>();
     public static MarryCommand marryCommand;
     //Getting an instance of the MarryPlugin. (Important for updating the config file)
     //This is used to determine whether a player is Single or Married to another.
@@ -65,7 +65,17 @@ public class MarryCommand implements CommandExecutor {
                             }
                         }
                         if (action.equals("decline")) {
-
+                            for(int i = 0; i < proposals.size(); i++) {
+                                String[] proposal = proposals.get(i);
+                                //The first value of the pair is the partner's name. (THE OTHER PLAYER)
+                                //This may seem confusing but consider the fact that /marry propose is run by the player
+                                //while /marry accept is being run by the partner. The partner of the partner is the player.
+                                if (proposal[0].equals(partner.getName()) && proposal[1].equals(player.getName())) {
+                                    proposals.remove(i);
+                                    break;
+                                }
+                            }
+                            partner.sendMessage("Your marriage proposal was rejected by " + player.getName());
                         }
                     }
                 }
