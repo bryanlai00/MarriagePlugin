@@ -48,7 +48,21 @@ public class MarryCommand implements CommandExecutor {
                             }
                         }
                         if (action.equals("accept")) {
-
+                            for(int i = 0; i < proposals.size(); i++) {
+                                String[] proposal = proposals.get(i);
+                                //The first value of the pair is the partner's name. (THE OTHER PLAYER)
+                                //This may seem confusing but consider the fact that /marry propose is run by the player
+                                //while /marry accept is being run by the partner. The partner of the partner is the player.
+                                if(proposal[0].equals(partner.getName()) && proposal[1].equals(player.getName())) {
+                                    plugin.getConfig().set(player.getName() + ".partner", partner.getName());
+                                    plugin.getConfig().set(partner.getName() + ".partner", player.getName());
+                                    plugin.saveConfig();
+                                    plugin.reloadConfig();
+                                    proposals.remove(i);
+                                    Bukkit.broadcastMessage(player.getName() + " and " + partner.getName() + " are now married!");
+                                    break;
+                                }
+                            }
                         }
                         if (action.equals("decline")) {
 
@@ -59,14 +73,14 @@ public class MarryCommand implements CommandExecutor {
                 else {
                     //Divorce can occur when the other player is NOT online.
                     if (action.equals("divorce")) {
-                        if(plugin.getConfig().getString(player.getName() + ".partner").equals(partner.getName())) {
+                        if(plugin.getConfig().getString(player.getName() + ".partner").equals(args[1])) {
                             plugin.getConfig().set(player.getName() + ".partner", "Single");
-                            plugin.getConfig().set(partner.getName() + ".partner", "Single");
-                            Bukkit.broadcastMessage(player.getName() + " has divorced " + partner.getName());
+                            plugin.getConfig().set(args[1] + ".partner", "Single");
+                            Bukkit.broadcastMessage(player.getName() + " has divorced " + args[1]);
                         }
                     }
                     else {
-                        player.sendMessage(partner.getName() + " is currently not online.");
+                        player.sendMessage(args[1] + " is currently not online.");
                     }
                 }
             }
