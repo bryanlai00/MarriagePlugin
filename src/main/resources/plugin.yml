@@ -1,0 +1,9 @@
+name: MarryPlugin
+version: ${project.version}
+main: me.gnarzy.marryplugin.MarryPlugin
+api-version: 1.13
+authors: [Gnarzy]
+description: Marriage Plugin for minecrafters.
+commands:
+  marry:
+    description: Marry a player in Minecraft.
