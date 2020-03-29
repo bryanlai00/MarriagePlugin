@@ -7,3 +7,4 @@ description: Marriage Plugin for minecrafters.
 commands:
   marry:
     description: Marry a player in Minecraft.
+    usage: /<command> [accept/decline/propose/divorce] [player_name]

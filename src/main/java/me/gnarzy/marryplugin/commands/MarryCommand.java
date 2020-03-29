@@ -27,10 +27,18 @@ public class MarryCommand implements CommandExecutor {
                 Player partner = Bukkit.getPlayerExact(args[1]);
                 String action = args[0];
                 if(partner != null) {
-                    if(partner.getName() != player.getName()) {
+                    if(partner.getName() == player.getName()) {
                         player.sendMessage("You can't marry yourself...");
                     }
                     else {
+                        //Must include divorce in both areas.
+                        if (action.equals("divorce")) {
+                            if(plugin.getConfig().getString(player.getName() + ".partner").equals(partner.getName())) {
+                                plugin.getConfig().set(player.getName() + ".partner", "Single");
+                                plugin.getConfig().set(partner.getName() + ".partner", "Single");
+                                Bukkit.broadcastMessage(player.getName() + " has divorced " + partner.getName() + "!");
+                            }
+                        }
                         if (action.equals("propose")) {
                             if(plugin.getConfig().getString(player.getName() + ".partner").equals("Single") && plugin.getConfig().getString(partner.getName() + ".partner").equals("Single")){
                                 proposals.add(new String[]{player.getName(), partner.getName()});
