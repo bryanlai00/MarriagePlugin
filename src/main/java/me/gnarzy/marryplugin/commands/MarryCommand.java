@@ -7,7 +7,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+
 public class MarryCommand implements CommandExecutor {
+    ArrayList<String[]> proposals = new ArrayList<String[]>();
+    public static MarryCommand marryCommand;
+    //Getting an instance of the MarryPlugin. (Important for updating the config file)
+    //This is used to determine whether a player is Single or Married to another.
     MarryPlugin plugin = MarryPlugin.plugin;
 
     @Override
@@ -22,16 +28,29 @@ public class MarryCommand implements CommandExecutor {
                 String action = args[0];
                 if(partner != null) {
                     if(partner.getName() != player.getName()) {
-                        player.sendMessage("You can't marry yourself dude.");
+                        player.sendMessage("You can't marry yourself...");
                     }
                     else {
                         if (action.equals("propose")) {
-
+                            if(plugin.getConfig().getString(player.getName() + ".partner").equals("Single") && plugin.getConfig().getString(partner.getName() + ".partner").equals("Single")){
+                                proposals.add(new String[]{player.getName(), partner.getName()});
+                                player.sendMessage("You have proposed to " + partner.getName() + "!");
+                                partner.sendMessage(player.getName() + " has proposed to you! It is up to you to accept or decline.");
+                            }
+                            else {
+                                //Disable polygamy. You cannot marry another while already married.
+                                if(!plugin.getConfig().getString(player.getName() + ".partner").equals("Single")) {
+                                    player.sendMessage("You are married to another!");
+                                }
+                                if(!plugin.getConfig().getString(partner.getName() + ".partner").equals("Single")) {
+                                    player.sendMessage("That person is married to " + plugin.getConfig().getString(partner.getName() + ".partner"));
+                                }
+                            }
                         }
                         if (action.equals("accept")) {
 
                         }
-                        if (action.equals("deny")) {
+                        if (action.equals("decline")) {
 
                         }
                     }
