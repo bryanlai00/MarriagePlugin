@@ -2,6 +2,7 @@ package me.gnarzy.marryplugin.commands;
 
 import me.gnarzy.marryplugin.MarryPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,6 +23,42 @@ public class MarryCommand implements CommandExecutor {
         if (sender instanceof Player) {
             //Set a variable player representing the command executor.
             Player player = (Player) sender;
+            if(args.length == 1) {
+                //Help messages.
+                if(args[0].equals("help")) {
+                    player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Marry Commands");
+                    player.sendMessage(ChatColor.GOLD + "/marry help:" + ChatColor.WHITE + " Lists options for the marry command.");
+                    player.sendMessage(ChatColor.GOLD + "/marry divorce:" + ChatColor.WHITE + " Divorce your partner.");
+                    player.sendMessage(ChatColor.GOLD + "/marry info:" + ChatColor.WHITE + " Tells you information about your marriage.");
+                    player.sendMessage(ChatColor.GOLD + "/marry propose [player]:" + ChatColor.WHITE + " Propose to a specific player.");
+                    player.sendMessage(ChatColor.GOLD + "/marry accept [player]:" + ChatColor.WHITE + " Accept a marriage proposal.");
+                    player.sendMessage(ChatColor.GOLD + "/marry decline [player]:" + ChatColor.WHITE + " Decline a marriage proposal.");
+                }
+                //Divorcing.
+                if (args[0].equals("divorce")) {
+                    String partner = plugin.getConfig().getString(player.getName() + ".partner");
+                    if(!plugin.getConfig().getString(player.getName() + ".partner").equals("Single")) {
+                        Bukkit.broadcastMessage(ChatColor.GREEN + player.getName() + ChatColor.WHITE + " has divorced " + ChatColor.GREEN + partner + ChatColor.WHITE + "!");
+                        plugin.getConfig().set(player.getName() + ".partner", "Single");
+                        plugin.getConfig().set(partner + ".partner", "Single");
+                        plugin.saveConfig();
+                        plugin.reloadConfig();
+                    }
+                    else {
+                        player.sendMessage(ChatColor.RED + "You aren't married to anyone.");
+                    }
+                }
+                //Info about marriage.
+                if(args[0].equals("info")) {
+                    String partner = plugin.getConfig().getString(player.getName() + ".partner");
+                    if(!partner.equals("Single")) {
+                        player.sendMessage("You are married to " + ChatColor.GREEN + partner);
+                    }
+                    else {
+                        player.sendMessage("You are currently " + ChatColor.RED + "single.");
+                    }
+                }
+            }
             if(args.length == 2) {
                 //See if the player is online.
                 Player partner = Bukkit.getPlayerExact(args[1]);
@@ -31,27 +68,19 @@ public class MarryCommand implements CommandExecutor {
                         player.sendMessage("You can't marry yourself...");
                     }
                     else {
-                        //Must include divorce in both areas.
-                        if (action.equals("divorce")) {
-                            if(plugin.getConfig().getString(player.getName() + ".partner").equals(partner.getName())) {
-                                plugin.getConfig().set(player.getName() + ".partner", "Single");
-                                plugin.getConfig().set(partner.getName() + ".partner", "Single");
-                                Bukkit.broadcastMessage(player.getName() + " has divorced " + partner.getName() + "!");
-                            }
-                        }
                         if (action.equals("propose")) {
                             if(plugin.getConfig().getString(player.getName() + ".partner").equals("Single") && plugin.getConfig().getString(partner.getName() + ".partner").equals("Single")){
                                 proposals.add(new String[]{player.getName(), partner.getName()});
-                                player.sendMessage("You have proposed to " + partner.getName() + "!");
-                                partner.sendMessage(player.getName() + " has proposed to you! It is up to you to accept or decline.");
+                                player.sendMessage("You have proposed to " + ChatColor.GREEN + partner.getName() + ChatColor.WHITE + "!");
+                                partner.sendMessage(ChatColor.GREEN + player.getName() + ChatColor.WHITE + " has proposed to you! It is up to you to accept or decline.");
                             }
                             else {
                                 //Disable polygamy. You cannot marry another while already married.
                                 if(!plugin.getConfig().getString(player.getName() + ".partner").equals("Single")) {
-                                    player.sendMessage("You are married to another!");
+                                    player.sendMessage(ChatColor.RED + "You are married to another!");
                                 }
                                 if(!plugin.getConfig().getString(partner.getName() + ".partner").equals("Single")) {
-                                    player.sendMessage("That person is married to " + plugin.getConfig().getString(partner.getName() + ".partner"));
+                                    player.sendMessage(ChatColor.RED + "That person is married to " + plugin.getConfig().getString(partner.getName() + ".partner"));
                                 }
                             }
                         }
@@ -67,7 +96,7 @@ public class MarryCommand implements CommandExecutor {
                                     plugin.saveConfig();
                                     plugin.reloadConfig();
                                     proposals.remove(i);
-                                    Bukkit.broadcastMessage(player.getName() + " and " + partner.getName() + " are now married!");
+                                    Bukkit.broadcastMessage(ChatColor.GREEN + player.getName() + ChatColor.WHITE + " and " + ChatColor.GREEN + partner.getName() + ChatColor.WHITE + " are now married!");
                                     break;
                                 }
                             }
@@ -83,23 +112,14 @@ public class MarryCommand implements CommandExecutor {
                                     break;
                                 }
                             }
-                            partner.sendMessage("Your marriage proposal was rejected by " + player.getName());
+                            player.sendMessage(ChatColor.RED + "You have rejected " + partner.getName() + "'s proposal.");
+                            partner.sendMessage(ChatColor.RED + "Your marriage proposal was rejected by " + player.getName());
                         }
                     }
                 }
                 //Cases when the player is not online
                 else {
-                    //Divorce can occur when the other player is NOT online.
-                    if (action.equals("divorce")) {
-                        if(plugin.getConfig().getString(player.getName() + ".partner").equals(args[1])) {
-                            plugin.getConfig().set(player.getName() + ".partner", "Single");
-                            plugin.getConfig().set(args[1] + ".partner", "Single");
-                            Bukkit.broadcastMessage(player.getName() + " has divorced " + args[1]);
-                        }
-                    }
-                    else {
-                        player.sendMessage(args[1] + " is currently not online.");
-                    }
+                        player.sendMessage(ChatColor.RED + args[1] + ChatColor.WHITE +  " is currently not online.");
                 }
             }
         }
