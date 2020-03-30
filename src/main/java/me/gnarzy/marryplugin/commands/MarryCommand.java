@@ -24,16 +24,19 @@ public class MarryCommand implements CommandExecutor {
             //Set a variable player representing the command executor.
             Player player = (Player) sender;
             if(args.length == 1) {
+
                 //Help messages.
                 if(args[0].equals("help")) {
                     player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Marry Commands");
                     player.sendMessage(ChatColor.GOLD + "/marry help:" + ChatColor.WHITE + " Lists options for the marry command.");
                     player.sendMessage(ChatColor.GOLD + "/marry divorce:" + ChatColor.WHITE + " Divorce your partner.");
                     player.sendMessage(ChatColor.GOLD + "/marry info:" + ChatColor.WHITE + " Tells you information about your marriage.");
+                    player.sendMessage(ChatColor.GOLD + "/marry tp:" + ChatColor.WHITE + " Teleport to your partner if they are online.");
                     player.sendMessage(ChatColor.GOLD + "/marry propose [player]:" + ChatColor.WHITE + " Propose to a specific player.");
                     player.sendMessage(ChatColor.GOLD + "/marry accept [player]:" + ChatColor.WHITE + " Accept a marriage proposal.");
                     player.sendMessage(ChatColor.GOLD + "/marry decline [player]:" + ChatColor.WHITE + " Decline a marriage proposal.");
                 }
+
                 //Divorcing.
                 if (args[0].equals("divorce")) {
                     String partner = plugin.getConfig().getString(player.getName() + ".partner");
@@ -48,6 +51,7 @@ public class MarryCommand implements CommandExecutor {
                         player.sendMessage(ChatColor.RED + "You aren't married to anyone.");
                     }
                 }
+
                 //Info about marriage.
                 if(args[0].equals("info")) {
                     String partner = plugin.getConfig().getString(player.getName() + ".partner");
@@ -56,6 +60,24 @@ public class MarryCommand implements CommandExecutor {
                     }
                     else {
                         player.sendMessage("You are currently " + ChatColor.RED + "single.");
+                    }
+                }
+
+                //Teleport to partner if they are online.
+                if(args[0].equals("tp")) {
+                    String partnerName = plugin.getConfig().getString(player.getName() + ".partner");
+                    if(partnerName.equals("Single")) {
+                        player.sendMessage("You cannot tp. You are currently " + ChatColor.RED + "single.");
+                    }
+                    else {
+                        Player partner = Bukkit.getPlayerExact(partnerName);
+                        try {
+                            player.teleport(partner.getLocation());
+                            partner.sendMessage(ChatColor.GREEN + player.getName() + ChatColor.WHITE + " has teleported to you.");
+                        }
+                        catch(NullPointerException e) {
+                            player.sendMessage("Your partner is not " + ChatColor.RED + "online!");
+                        }
                     }
                 }
             }
